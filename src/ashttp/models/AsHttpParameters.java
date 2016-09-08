@@ -25,6 +25,11 @@ public class AsHttpParameters implements Serializable {
 		this.key = key;
 		this.value = value;
 	}
+	
+	@Override
+	public String toString() {
+		return this.key + "=" + this.value;
+	}
 
 	public String getKey() {
 		return key;
