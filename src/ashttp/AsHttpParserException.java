@@ -28,6 +28,14 @@ public class AsHttpParserException extends Exception {
 		this.code = code;
 		this.details = details;
 	}
+	
+	@Override
+	public String getMessage() {
+		if(this.code.isEmpty()) {
+			return super.getMessage();	
+		}
+		return this.code + " - " + super.getMessage();
+	}
 
 	public String getCode() {
 		return code;
