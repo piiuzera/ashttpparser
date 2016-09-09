@@ -25,6 +25,15 @@ public class AsHttpAuthorization implements Serializable {
 		this.username = username;
 		this.password = password;
 	}
+	
+	@Override
+	public String toString() {
+		return this.username + ":" + this.password;
+	}
+	
+	public boolean isEmpty() {
+		return this.username.isEmpty() && this.password.isEmpty();
+	}
 
 	public String getUsername() {
 		return username;
