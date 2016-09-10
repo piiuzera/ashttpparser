@@ -1,5 +1,5 @@
 package ashttp.models.enumtypes;
 
-public enum AsHttpHeader {
+public enum AsEnumHeader {
 	
 }

@@ -12,7 +12,7 @@ import java.util.Vector;
 
 import ashttp.models.AsHttpAuthorization;
 import ashttp.models.AsHttpParameters;
-import ashttp.models.enumtypes.AsHttpMethod;
+import ashttp.models.enumtypes.AsEnumMethod;
 
 /**
  * Class handling of HTTP requests.
@@ -23,7 +23,7 @@ public class AsHttpRequest implements Serializable {
 	private static final long serialVersionUID = -7853035488405752559L;
 	
 	private String url;
-	private AsHttpMethod method;
+	private AsEnumMethod method;
 	
 	private int statusCode;
 	private AsHttpResponse response;
@@ -35,7 +35,7 @@ public class AsHttpRequest implements Serializable {
 	
 	public AsHttpRequest() {
 		this.url = "";
-		this.method = AsHttpMethod.GET;
+		this.method = AsEnumMethod.GET;
 		
 		this.statusCode = 0;
 		this.response = new AsHttpResponse();
@@ -48,7 +48,7 @@ public class AsHttpRequest implements Serializable {
 	
 	public AsHttpRequest(String url) {
 		this.url = url;
-		this.method = AsHttpMethod.GET;
+		this.method = AsEnumMethod.GET;
 		
 		this.statusCode = 0;
 		this.response = new AsHttpResponse();
@@ -59,7 +59,7 @@ public class AsHttpRequest implements Serializable {
 		this.headers = new Vector<AsHttpParameters>();
 	}
 	
-	public AsHttpRequest(String url, AsHttpMethod method) {
+	public AsHttpRequest(String url, AsEnumMethod method) {
 		this.url = url;
 		this.method = method;
 		
@@ -124,10 +124,10 @@ public class AsHttpRequest implements Serializable {
 		this.url = url;
 	}
 
-	public AsHttpMethod getMethod() {
+	public AsEnumMethod getMethod() {
 		return method;
 	}
-	public void setMethod(AsHttpMethod method) {
+	public void setMethod(AsEnumMethod method) {
 		this.method = method;
 	}
 	

@@ -5,17 +5,17 @@ package ashttp.models.enumtypes;
  * @author Matheus Amaro
  *
  */
-public enum AsHttpMethod {
+public enum AsEnumMethod {
 	GET("GET"), POST("POST"), PUT("PUT"), DELETE("DELETE"), OPTION("OPTION");
 	
 	private String value;
 	
-	AsHttpMethod(String value) {
+	AsEnumMethod(String value) {
 		this.value = value;
 	}
 	
 	public String getNameByValue(String value) {
-		for(AsHttpMethod objEnum : values()) {
+		for(AsEnumMethod objEnum : values()) {
 			if(value.equals(objEnum.getValue())) {
 				return objEnum.name();
 			}
@@ -23,8 +23,8 @@ public enum AsHttpMethod {
         return null;
 	}
 	
-	public AsHttpMethod getEnumByValue(String value) {
-		for(AsHttpMethod objEnum : values()) {
+	public AsEnumMethod getEnumByValue(String value) {
+		for(AsEnumMethod objEnum : values()) {
 			if(value.equals(objEnum.getValue())) {
 				return objEnum;
 			}
