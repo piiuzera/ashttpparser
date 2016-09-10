@@ -11,7 +11,7 @@ public class AsHttpParameters implements Serializable {
 	private static final long serialVersionUID = 5561313429438187237L;
 	
 	private String key;
-	private String value;
+	private Object value;
 	
 	public AsHttpParameters() {
 		this.key = "";
@@ -21,7 +21,7 @@ public class AsHttpParameters implements Serializable {
 		this.key = key;
 		this.value = "";		
 	}
-	public AsHttpParameters(String key, String value) {
+	public AsHttpParameters(String key, Object value) {
 		this.key = key;
 		this.value = value;
 	}
@@ -38,10 +38,10 @@ public class AsHttpParameters implements Serializable {
 		this.key = key;
 	}
 
-	public String getValue() {
+	public Object getValue() {
 		return value;
 	}
-	public void setValue(String value) {
+	public void setValue(Object value) {
 		this.value = value;
 	}
 }
