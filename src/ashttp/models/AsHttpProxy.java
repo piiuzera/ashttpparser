@@ -9,12 +9,21 @@ import java.io.Serializable;
 public class AsHttpProxy implements Serializable {
 	private static final long serialVersionUID = 6009111591090680944L;
 	
+	private String protocol;
 	private String host;
 	private int port;
 	
-	public AsHttpProxy(String host, int port) {
+	public AsHttpProxy(String protocol, String host, int port) {
+		this.protocol = protocol;
 		this.host = host;
 		this.port = port;
+	}
+	
+	public String getProtocol() {
+		return protocol;
+	}
+	public void setProtocol(String protocol) {
+		this.protocol = protocol;
 	}
 	
 	public String getHost() {

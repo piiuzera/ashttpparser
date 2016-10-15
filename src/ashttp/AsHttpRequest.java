@@ -4,8 +4,11 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
+import java.net.Proxy;
 import java.net.URL;
+import java.net.Proxy.Type;
 import java.util.Base64;
 import java.util.Vector;
 
@@ -30,7 +33,7 @@ public class AsHttpRequest implements Serializable {
 	
 	private AsHttpAuthorization authorization;
 	
-	private AsHttpProxy proxy;
+	private Proxy proxy;
 	
 	private Vector<AsHttpParameters> formData;
 	private Vector<AsHttpParameters> headers;
@@ -43,6 +46,8 @@ public class AsHttpRequest implements Serializable {
 		
 		this.authorization = new AsHttpAuthorization();
 		
+		this.proxy = null;
+		
 		this.formData = new Vector<AsHttpParameters>();
 		this.headers = new Vector<AsHttpParameters>();
 	}
@@ -54,6 +59,8 @@ public class AsHttpRequest implements Serializable {
 		this.statusCode = 0;
 		
 		this.authorization = new AsHttpAuthorization();
+				
+		this.proxy = null;
 		
 		this.formData = new Vector<AsHttpParameters>();
 		this.headers = new Vector<AsHttpParameters>();
@@ -66,6 +73,8 @@ public class AsHttpRequest implements Serializable {
 		this.statusCode = 0;
 		
 		this.authorization = new AsHttpAuthorization();
+		
+		this.proxy = null;
 		
 		this.formData = new Vector<AsHttpParameters>();
 		this.headers = new Vector<AsHttpParameters>();
@@ -82,18 +91,14 @@ public class AsHttpRequest implements Serializable {
 			
 			URL httpUrl = new URL(this.url);
 			
-			HttpURLConnection http;
-			
-			if(this.proxy != null) {
-				http = (HttpURLConnection)httpUrl.openConnection();
-			} else {
-				http = (HttpURLConnection)httpUrl.openConnection();	
-			}
+			HttpURLConnection http = this.proxy != null ? (HttpURLConnection)httpUrl.openConnection(this.proxy) : (HttpURLConnection)httpUrl.openConnection();
 			
 			http.setRequestMethod(this.method.getValue());
-			http.setDoInput(true);
+			//http.setDoInput(true);
 			http.setDoOutput(true);
-			http.setUseCaches(false);
+			//http.setUseCaches(false);
+			
+			http.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36");
 			
 			if(!this.headers.isEmpty()) {
 				for(AsHttpParameters objHeader : this.headers) {
@@ -116,14 +121,14 @@ public class AsHttpRequest implements Serializable {
 				}
 			}
 			
-			this.response = new AsHttpResponse(http.getInputStream(), this.headers, http);
+			this.response = new AsHttpResponse(http.getInputStream(), http);
 			
 			this.statusCode = http.getResponseCode();
 			
 		} catch (MalformedURLException ex) {
-			throw new AsHttpParserException("Url informed this invalid.", "ASHTTPREQUEST8x12");
+			throw new AsHttpParserException(ex.getMessage() + "Url informed this invalid.", "ASHTTPREQUEST8x12");
 		} catch (IOException ex) {
-			throw new AsHttpParserException("Error requesting access to the server, check your internet connection.", "ASHTTPREQUEST8x13");
+			throw new AsHttpParserException(ex.getMessage() + "Error requesting access to the server, check your internet connection.", "ASHTTPREQUEST8x13");
 		}
 	}
 
@@ -159,11 +164,19 @@ public class AsHttpRequest implements Serializable {
 		this.authorization = authorization;
 	}
 	
-	public AsHttpProxy getProxy() {
+	public Proxy getProxy() {
 		return proxy;
 	}
-	public void addProxy(AsHttpProxy proxy) {
-		this.proxy = proxy;
+	public void setProxy(AsHttpProxy proxy) {
+		
+		Type type = Type.HTTP;
+		for(Type objType : Type.values()) {
+			if(objType.name() == proxy.getProtocol()) {
+				type = objType;
+			}
+		}
+		
+		this.proxy = new Proxy(type, new InetSocketAddress(proxy.getHost(), proxy.getPort()));
 	}
 
 	public Vector<AsHttpParameters> getFormData() {

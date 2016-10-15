@@ -12,6 +12,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.jsoup.nodes.Document;
 
 import ashttp.models.AsHttpParameters;
@@ -21,17 +24,17 @@ public class AsHttpResponse implements Serializable {
 	
 	private Document document;
 	
+	private JSONObject json;
+	
 	private int statusCode;
 	
 	private Vector<AsHttpParameters> headers;
 	
 	private Vector<AsHttpParameters> cookie;
 	
-	public AsHttpResponse(InputStream inputStream, Vector<AsHttpParameters> headers, HttpURLConnection http) throws AsHttpParserException {
+	public AsHttpResponse(InputStream inputStream, HttpURLConnection http) throws AsHttpParserException {
 		String lineResponse = "";
 		StringBuffer responseStream = new StringBuffer();
-		
-		this.headers = headers;
 		
 		try {
 			BufferedReader buff = new BufferedReader(new InputStreamReader(inputStream));
@@ -40,14 +43,43 @@ public class AsHttpResponse implements Serializable {
 			}
 			buff.close();
 			
-			this.document = new Document(responseStream.toString());
+			this.headers = getHeaders(http.getHeaderFields());
+			
+			if(responseStream.toString().matches(".*\\<[^>]+>.*")) {
+				this.document = new Document(responseStream.toString());
+				this.json = null;
+			} else {
+				this.json = (JSONObject)new JSONParser().parse(responseStream.toString());
+				this.document = null;
+			}
 			
 			this.cookie = getCookie(http.getHeaderFields());
 			
 		} catch (IOException ex) {
 			throw new AsHttpParserException("Url Informada Está Inválida!",
 					"AS8X101", ex.getMessage());
+		} catch (ParseException ex) {
+			throw new AsHttpParserException("Url Informada Está Inválida!",
+					"AS8X102", ex.getMessage());
 		}
+	}
+	
+	private Vector<AsHttpParameters> getHeaders(Map<String, List<String>> headers) {
+		Vector<AsHttpParameters> listHeaders = new Vector<AsHttpParameters>();
+
+		Set<String> headerFieldsSet = headers.keySet();
+		Iterator<String> hearerFieldsIter = headerFieldsSet.iterator();
+		
+		while (hearerFieldsIter.hasNext()) {
+			String headerFieldKey = hearerFieldsIter.next();
+			if (headerFieldKey != null && !"Set-Cookie".equalsIgnoreCase(headerFieldKey)) {
+				List<String> headerFieldValue = headers.get(headerFieldKey);
+				for(String headerValue : headerFieldValue) {
+					listHeaders.add(new AsHttpParameters(headerFieldKey, headerValue));
+				}
+			}
+		}
+		return listHeaders;
 	}
 	
 	private Vector<AsHttpParameters> getCookie(Map<String, List<String>> headers) {
@@ -109,6 +141,10 @@ public class AsHttpResponse implements Serializable {
 
 	public Document getDocument() {
 		return document;
+	}
+	
+	public JSONObject getJson() {
+		return json;
 	}
 
 	public Vector<AsHttpParameters> getCookie() {

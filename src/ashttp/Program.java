@@ -1,19 +1,19 @@
 package ashttp;
 
-import ashttp.models.AsHttpAuthorization;
+import ashttp.models.AsHttpProxy;
 import ashttp.models.enumtypes.AsEnumMethod;
 
 public class Program {
 	public static void main(String[] args) {
 		AsHttpRequest request = new AsHttpRequest();
-		request.setUrl("http://sapdsf.grupomag.corp:8000/gerencial/");
+		request.setUrl("http://www.localizaip.com.br/api/iplocation.php");
 		request.setMethod(AsEnumMethod.GET);
-		request.setAuthorization(new AsHttpAuthorization("phlp0001", "3141569"));
+		request.setProxy(new AsHttpProxy("HTTP", "23.91.96.251", 80));
 		
 		try {
 			request.send();
 			
-			System.out.println(request.getResponse().getDocument());
+			System.out.println(request.getResponse().getJson().get("ip"));
 		} catch (AsHttpParserException e) {
 			System.out.println(e.getMessage());
 		}
