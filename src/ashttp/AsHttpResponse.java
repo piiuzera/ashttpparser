@@ -16,6 +16,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import ashttp.models.AsHttpParameters;
@@ -48,7 +49,7 @@ public class AsHttpResponse implements Serializable {
 			this.headers = getHeaders(http.getHeaderFields());
 			
 			if(responseStream.toString().matches(".*\\<[^>]+>.*")) {
-				this.document = new Document(responseStream.toString());
+				this.document = Jsoup.parse(responseStream.toString());
 				this.jsonObject = null;
 				this.jsonArray = null;
 			} else if(new JSONParser().parse(responseStream.toString()) instanceof JSONObject) {
