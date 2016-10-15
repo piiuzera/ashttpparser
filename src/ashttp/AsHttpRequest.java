@@ -94,9 +94,9 @@ public class AsHttpRequest implements Serializable {
 			HttpURLConnection http = this.proxy != null ? (HttpURLConnection)httpUrl.openConnection(this.proxy) : (HttpURLConnection)httpUrl.openConnection();
 			
 			http.setRequestMethod(this.method.getValue());
-			//http.setDoInput(true);
+			http.setDoInput(true);
 			http.setDoOutput(true);
-			//http.setUseCaches(false);
+			http.setUseCaches(false);
 			
 			http.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36");
 			
@@ -126,9 +126,9 @@ public class AsHttpRequest implements Serializable {
 			this.statusCode = http.getResponseCode();
 			
 		} catch (MalformedURLException ex) {
-			throw new AsHttpParserException(ex.getMessage() + "Url informed this invalid.", "ASHTTPREQUEST8x12");
+			throw new AsHttpParserException("Url informed this invalid.", "ASHTTPREQUEST8x12");
 		} catch (IOException ex) {
-			throw new AsHttpParserException(ex.getMessage() + "Error requesting access to the server, check your internet connection.", "ASHTTPREQUEST8x13");
+			throw new AsHttpParserException("Error requesting access to the server, check your internet connection.", "ASHTTPREQUEST8x13");
 		}
 	}
 

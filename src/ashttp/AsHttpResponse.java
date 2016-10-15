@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -24,7 +25,8 @@ public class AsHttpResponse implements Serializable {
 	
 	private Document document;
 	
-	private JSONObject json;
+	private JSONObject jsonObject;
+	private JSONArray jsonArray;
 	
 	private int statusCode;
 	
@@ -47,10 +49,16 @@ public class AsHttpResponse implements Serializable {
 			
 			if(responseStream.toString().matches(".*\\<[^>]+>.*")) {
 				this.document = new Document(responseStream.toString());
-				this.json = null;
-			} else {
-				this.json = (JSONObject)new JSONParser().parse(responseStream.toString());
+				this.jsonObject = null;
+				this.jsonArray = null;
+			} else if(new JSONParser().parse(responseStream.toString()) instanceof JSONObject) {
+				this.jsonObject = (JSONObject)new JSONParser().parse(responseStream.toString());
 				this.document = null;
+				this.jsonArray = null;
+			} else if(new JSONParser().parse(responseStream.toString()) instanceof JSONArray) {
+				this.jsonArray = (JSONArray)new JSONParser().parse(responseStream.toString());
+				this.document = null;
+				this.jsonObject = null;
 			}
 			
 			this.cookie = getCookie(http.getHeaderFields());
@@ -144,7 +152,11 @@ public class AsHttpResponse implements Serializable {
 	}
 	
 	public JSONObject getJson() {
-		return json;
+		return jsonObject;
+	}
+	
+	public JSONArray getJsonArray() {
+		return jsonArray;
 	}
 
 	public Vector<AsHttpParameters> getCookie() {
