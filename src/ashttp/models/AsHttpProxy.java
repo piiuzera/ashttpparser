@@ -11,20 +11,10 @@ public class AsHttpProxy implements Serializable {
 	
 	private String host;
 	private int port;
-	private String user;
-	private String password;
 	
 	public AsHttpProxy(String host, int port) {
 		this.host = host;
 		this.port = port;
-		this.user = "";
-		this.password = "";
-	}
-	public AsHttpProxy(String host, int port, String user, String password) {
-		this.host = host;
-		this.port = port;
-		this.user = user;
-		this.password = password;
 	}
 	
 	public String getHost() {
@@ -39,19 +29,5 @@ public class AsHttpProxy implements Serializable {
 	}
 	public void setPort(int port) {
 		this.port = port;
-	}
-	
-	public String getUser() {
-		return user;
-	}
-	public void setUser(String user) {
-		this.user = user;
-	}
-	
-	public String getPassword() {
-		return password;
-	}
-	public void setPassword(String password) {
-		this.password = password;
 	}
 }

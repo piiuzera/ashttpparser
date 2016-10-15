@@ -7,14 +7,11 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Base64;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.Vector;
 
 import ashttp.models.AsHttpAuthorization;
 import ashttp.models.AsHttpParameters;
+import ashttp.models.AsHttpProxy;
 import ashttp.models.enumtypes.AsEnumMethod;
 
 /**
@@ -33,9 +30,10 @@ public class AsHttpRequest implements Serializable {
 	
 	private AsHttpAuthorization authorization;
 	
+	private AsHttpProxy proxy;
+	
 	private Vector<AsHttpParameters> formData;
 	private Vector<AsHttpParameters> headers;
-	private Vector<AsHttpParameters> cookies;
 	
 	public AsHttpRequest() {
 		this.url = "";
@@ -47,7 +45,6 @@ public class AsHttpRequest implements Serializable {
 		
 		this.formData = new Vector<AsHttpParameters>();
 		this.headers = new Vector<AsHttpParameters>();
-		this.cookies = new Vector<AsHttpParameters>();
 	}
 	
 	public AsHttpRequest(String url) {
@@ -60,7 +57,6 @@ public class AsHttpRequest implements Serializable {
 		
 		this.formData = new Vector<AsHttpParameters>();
 		this.headers = new Vector<AsHttpParameters>();
-		this.cookies = new Vector<AsHttpParameters>();
 	}
 	
 	public AsHttpRequest(String url, AsEnumMethod method) {
@@ -73,7 +69,6 @@ public class AsHttpRequest implements Serializable {
 		
 		this.formData = new Vector<AsHttpParameters>();
 		this.headers = new Vector<AsHttpParameters>();
-		this.cookies = new Vector<AsHttpParameters>();
 	}
 	
 	public void send() throws AsHttpParserException {		
@@ -86,7 +81,14 @@ public class AsHttpRequest implements Serializable {
 			}
 			
 			URL httpUrl = new URL(this.url);
-			HttpURLConnection http = (HttpURLConnection)httpUrl.openConnection();
+			
+			HttpURLConnection http;
+			
+			if(this.proxy != null) {
+				http = (HttpURLConnection)httpUrl.openConnection();
+			} else {
+				http = (HttpURLConnection)httpUrl.openConnection();	
+			}
 			
 			http.setRequestMethod(this.method.getValue());
 			http.setDoInput(true);
@@ -114,64 +116,15 @@ public class AsHttpRequest implements Serializable {
 				}
 			}
 			
-			this.cookies = getCookie(http.getHeaderFields());
+			this.response = new AsHttpResponse(http.getInputStream(), this.headers, http);
 			
-			this.response = new AsHttpResponse(http.getInputStream(), this.headers);
+			this.statusCode = http.getResponseCode();
 			
 		} catch (MalformedURLException ex) {
 			throw new AsHttpParserException("Url informed this invalid.", "ASHTTPREQUEST8x12");
 		} catch (IOException ex) {
 			throw new AsHttpParserException("Error requesting access to the server, check your internet connection.", "ASHTTPREQUEST8x13");
 		}
-	}
-	
-	private Vector<AsHttpParameters> getCookie(Map<String, List<String>> headers) {
-		Vector<AsHttpParameters> cookies = new Vector<AsHttpParameters>();
-
-		Set<String> headerFieldsSet = headers.keySet();
-		Iterator<String> hearerFieldsIter = headerFieldsSet.iterator();
-
-		while (hearerFieldsIter.hasNext()) {
-			String headerFieldKey = hearerFieldsIter.next();
-			if ("Set-Cookie".equalsIgnoreCase(headerFieldKey)) {
-				List<String> headerFieldValue = headers.get(headerFieldKey);
-				for (String headerValue : headerFieldValue) {
-
-					String[] fields = headerValue.split(";\\s*");
-
-					String cookieValue = fields[0];
-					String expires = null;
-					String path = null;
-					String domain = null;
-					boolean secure = false;
-
-					for (int j = 1; j < fields.length; j++) {
-						if ("secure".equalsIgnoreCase(fields[j])) {
-							secure = true;
-						}
-						else if (fields[j].indexOf('=') > 0) {
-							String[] f = fields[j].split("=");
-							if ("expires".equalsIgnoreCase(f[0])) {
-								expires = f[1];
-							}
-							else if ("domain".equalsIgnoreCase(f[0])) {
-								domain = f[1];
-							}
-							else if ("path".equalsIgnoreCase(f[0])) {
-								path = f[1];
-							}
-						}
-
-					}
-					cookies.add(new AsHttpParameters("cookieValue", cookieValue));
-					cookies.add(new AsHttpParameters("expires", expires));
-					cookies.add(new AsHttpParameters("path", path));
-					cookies.add(new AsHttpParameters("domain", domain));
-					cookies.add(new AsHttpParameters("secure", secure));
-				}
-			}
-		}
-		return cookies;
 	}
 
 	public String getUrl() {
@@ -205,6 +158,13 @@ public class AsHttpRequest implements Serializable {
 	public void setAuthorization(AsHttpAuthorization authorization) {
 		this.authorization = authorization;
 	}
+	
+	public AsHttpProxy getProxy() {
+		return proxy;
+	}
+	public void addProxy(AsHttpProxy proxy) {
+		this.proxy = proxy;
+	}
 
 	public Vector<AsHttpParameters> getFormData() {
 		return formData;
@@ -226,9 +186,5 @@ public class AsHttpRequest implements Serializable {
 		} else {
 			throw new AsHttpParserException("Header can't be null.", "ASHTTPREQUEST8x11");
 		}
-	}
-
-	public Vector<AsHttpParameters> getCookies() {
-		return cookies;
 	}
 }
